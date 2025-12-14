@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Transmission</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  font-family: monospace;
+  background: black;
+  color: #00ff9c;
+}
+
+/* =====================
+   INTRO CYBERPUNK
+===================== */
+
+#intro {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at center, rgba(0,255,156,0.08), transparent 60%),
+    linear-gradient(120deg, #020202, #050505, #020202);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: flicker 4s infinite;
+  z-index: 10;
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.96; }
+}
+
+.scanlines::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0,255,156,0.03),
+    rgba(0,255,156,0.03) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events: none;
+}
+
+#title {
+  letter-spacing: 4px;
+  opacity: 0.8;
+  margin-bottom: 40px;
+}
+
+#enter {
+  padding: 14px 40px;
+  border: 1px solid #00ff9c;
+  color: #00ff9c;
+  background: transparent;
+  cursor: pointer;
+  letter-spacing: 3px;
+  transition: all 0.3s ease;
+}
+
+#enter:hover {
+  background: #00ff9c;
+  color: black;
+  box-shadow: 0 0 25px #00ff9c;
+}
+
+/* =====================
+   VIDEO INTRO
+===================== */
+
+#videoContainer {
+  position: fixed;
+  inset: 0;
+  background: black;
+  display: none;
+  opacity: 0;
+  transition: opacity 2s ease;
+  z-index: 9;
+}
+
+#videoContainer.active {
+  display: block;
+  opacity: 1;
+}
+
+video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* =====================
+   MONDE OUTER WILDS
+===================== */
+
+#world {
+  position: fixed;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 4s ease;
+  overflow: hidden;
+
+  display: flex;           /* ajouté */
+  justify-content: center; /* centré horizontal */
+  align-items: center;     /* centré vertical */
+  text-align: center;      /* texte centré */
+}
+
+
+#world.active {
+  opacity: 1;
+}
+
+#bgVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+#world::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(0,0,0,0.3), rgba(0,0,0,0.9));
+  z-index: 1;
+}
+
+#world-content {
+  position: relative;
+  z-index: 2;
+  max-width: 600px;
+  color: #eae6d8;
+  font-family: 'Georgia', serif;
+}
+
+
+#world h1 {
+  font-weight: 400;
+  margin-bottom: 20px;
+}
+
+#world p {
+  line-height: 1.8;
+  opacity: 0.9;
+}
+
+/* =====================
+   CURSOR LIGHT
+===================== */
+
+#cursor-light {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle 180px at 50% 50%,
+    rgba(255,255,255,0.08),
+    rgba(0,0,0,0.85)
+  );
+  transition: background 0.05s linear;
+  z-index: 5;
+}
+</style>
+</head>
+
+<body>
+
+<!-- INTRO -->
+<div id="intro" class="scanlines">
+  <div id="title">SYSTEM INTERFACE</div>
+  <button id="enter">INITIALISER</button>
+</div>
+
+<!-- VIDEO INTRO -->
+<div id="videoContainer">
+  <video id="introVideo">
+    <source src="C:\Users\hunts\Downloads\site\intr0.mp4" type="video/mp4">
+  </video>
+</div>
+
+<!-- MONDE PRINCIPAL -->
+<div id="world">
+
+  <video id="bgVideo" autoplay muted loop playsinline>
+    <source src="C:\Users\hunts\Downloads\site\wall.mp4" type="video/mp4">
+  </video>
+
+  <div id="world-content">
+    <h1>Bienvenue.</h1>
+    <p>
+      Ce n’est pas un site comme les autres.<br>
+      C’est un endroit.<br>
+      Et si tu es ici… c’est que tu avais besoin de t’arrêter.
+    </p>
+  </div>
+
+  <!-- Bouton Merci (initialement caché) -->
+<button id="thanksBtn" style="
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px 50px;
+  font-size: 24px;
+  border: 2px solid #00ff9c;
+  background: transparent;
+  color: #00ff9c;
+  cursor: pointer;
+  display: none;
+  z-index: 10;
+">Merci</button>
+
+  
+  <div id="credits" style="
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.95); /* fond presque opaque */
+  color: #eae6d8;
+  font-family: 'Georgia', serif;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 50px;
+  z-index: 20; /* au-dessus de tout */
+">
+  <h1>Crédits</h1>
+  <div id="credits-list">
+    <!-- Ici tu mettras les noms -->
+    <p>WeZnokX</p>
+    <p>Sarah</p>
+    <p>Lupika</p>
+    <p>Taruki</p>
+    <p>Raptrix</p>
+    <p>Torakedal</p>
+    <p>naoi</p>
+    <p>Shiva</p>
+    <p>Eliott</p>
+    <p>Et les autres que j'ai un jour croisé.</p>
+  </div>
+  
+  <button id="byeBtn" style="
+  margin-top: 40px;
+  padding: 12px 30px;
+  font-size: 16px;
+  letter-spacing: 2px;
+  background: transparent;
+  color: #00ff9c;
+  border: 1px solid #00ff9c;
+  cursor: pointer;
+">
+  À bientôt
+</button>
+<div id="crash" style="
+  position: fixed;
+  inset: 0;
+  background: black;
+  color: #00ff9c;
+  font-family: monospace;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  text-align: center;
+">
+  <div>
+    <p>SYSTEM FAILURE</p>
+    <p>CRITICAL ERROR</p>
+    <p>SHUTTING DOWN...</p>
+  </div>
+</div>
+
+</div>
+
+
+<!-- AUDIO -->
+<audio id="music" src="C:\Users\hunts\Downloads\site\Outer Wilds.mp3"></audio>
+<audio id="music2" src="C:\Users\hunts\Downloads\site\music 2.mp3"></audio>
+<audio id="music3" src="C:\Users\hunts\Downloads\site\music 3.mp3"></audio>
+<audio id="humanVoice" src="C:\Users\hunts\Downloads\site\merci.mp3"></audio>
+
+<div id="cursor-light"></div>
+
+<script>
+const enter = document.getElementById("enter");
+const intro = document.getElementById("intro");
+const videoContainer = document.getElementById("videoContainer");
+const introVideo = document.getElementById("introVideo");
+
+const world = document.getElementById("world");
+const music = document.getElementById("music");
+const music2 = document.getElementById("music2");
+const music3 = document.getElementById("music3");
+const humanVoice = document.getElementById("humanVoice");
+
+// CLICK INITIALISER
+enter.addEventListener("click", () => {
+  // lancer fondu de l'intro
+  intro.style.transition = "opacity 2s ease";
+  intro.style.opacity = 0;
+
+  // afficher la vidéo AVEC fondu
+  setTimeout(() => {
+    intro.style.display = "none";
+    videoContainer.classList.add("active"); // active = opacity 1
+    introVideo.play();
+  }, 2000); // correspond à la durée du fondu
+});
+
+// FIN VIDEO INTRO
+introVideo.addEventListener("ended", () => {
+  videoContainer.style.opacity = 0;
+
+  setTimeout(() => {
+    videoContainer.style.display = "none";
+    world.classList.add("active");
+
+    // ---- ENCHAÎNEMENT DES MUSIQUES ----
+    playMusicSequence([music, music2, music3], 0);
+
+  }, 2000);
+});
+
+// Fonction pour enchaîner plusieurs musiques avec fondu, baisse volume et voix
+function playMusicSequence(tracks, index) {
+  if (index >= tracks.length) return;
+
+  const track = tracks[index];
+  track.volume = 0;
+  track.play();
+
+  // Fondu d'entrée
+  let v = 0;
+  const fadeIn = setInterval(() => {
+    v += 0.01;
+    track.volume = v;
+    if (v >= 0.4) clearInterval(fadeIn);
+  }, 100);
+
+  // Pour toutes les musiques : baisse du volume après 10s
+  setTimeout(() => fadeMusic(track, 0.15, 3000), 10000);
+
+  // Lancer la voix off après 20s
+  setTimeout(() => humanVoice.play(), 20000);
+
+  // Quand la musique se termine, passer à la suivante
+  track.addEventListener("ended", () => {
+    fadeMusic(track, 0, 1000); // fondu sortie
+    setTimeout(() => playMusicSequence(tracks, index + 1), 1000);
+  }, { once: true });
+}
+
+// FONDU MUSIQUE
+function fadeMusic(audio, target, duration) {
+  const step = 100;
+  const steps = duration / step;
+  const delta = (audio.volume - target) / steps;
+
+  const f = setInterval(() => {
+    if (audio.volume > target) {
+      audio.volume -= delta;
+    } else {
+      clearInterval(f);
+    }
+  }, step);
+}
+
+// Quand la voix off se termine, afficher le bouton Merci
+humanVoice.addEventListener("ended", () => {
+  const lastMusic = music3; // la dernière musique
+  fadeMusic(lastMusic, 0.4, 3000); // remonter le volume
+
+  // afficher le bouton
+  const thanksBtn = document.getElementById("thanksBtn");
+  thanksBtn.style.display = "block";
+});
+
+// Quand on clique sur le bouton Merci
+document.getElementById("thanksBtn").addEventListener("click", () => {
+  const credits = document.getElementById("credits");
+  credits.style.display = "flex"; // afficher le bloc plein écran
+  // masquer le bouton
+  document.getElementById("thanksBtn").style.display = "none";
+});
+const byeBtn = document.getElementById("byeBtn");
+const crash = document.getElementById("crash");
+
+byeBtn.addEventListener("click", () => {
+  // couper tous les sons
+  music.pause();
+  music2.pause();
+  music3.pause();
+  humanVoice.pause();
+
+  // afficher écran crash
+  crash.style.display = "flex";
+
+  // petit effet glitch
+  let flicker = 0;
+  const glitch = setInterval(() => {
+    crash.style.opacity = Math.random();
+    flicker++;
+    if (flicker > 10) clearInterval(glitch);
+  }, 80);
+
+  // "fermeture" du site
+  setTimeout(() => {
+    document.body.innerHTML = "";
+    document.body.style.background = "black";
+  }, 2000);
+});
+
+
+
+
+// CURSOR LIGHT
+const light = document.getElementById("cursor-light");
+
+document.addEventListener("mousemove", (e) => {
+  light.style.background = `
+    radial-gradient(
+      circle 180px at ${e.clientX}px ${e.clientY}px,
+      rgba(255,255,255,0.10),
+      rgba(0,0,0,0.9)
+    )
+  `;
+});
+</script>
+
+</body>
+</html>
